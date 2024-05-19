@@ -1,6 +1,8 @@
 package com.example.RegisterLogin.EmployeeController;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,18 +22,24 @@ public class EmployeeController {
 	@Autowired
 	private EmployeeService employeeService;
 
-    @PostMapping(path = "/save")
-	public String saveEmployee(@RequestBody EmployeeDTO employeeDTO) {
-		String id=employeeService.addEmployee(employeeDTO);
-		return id;
+	@PostMapping("/save")
+	public ResponseEntity<String> saveEmployee(@RequestBody EmployeeDTO employeeDTO) {
+		try {
+			String result = employeeService.addEmployee(employeeDTO);
+			return ResponseEntity.status(HttpStatus.CREATED).body(result);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving employee: " + e.getMessage());
+		}
 	}
-	
-	
-	@PostMapping(path = "/login")
-	public ResponseEntity<LoginResponse> loginEmployee(@RequestBody LoginDTO loginDTO)
-	{
-		LoginResponse loginResponse=employeeService.loginEmployee(loginDTO);
-		return ResponseEntity.ok(loginResponse);
+
+	@PostMapping("/login")
+	public ResponseEntity<LoginResponse> loginEmployee(@RequestBody LoginDTO loginDTO) {
+		try {
+			LoginResponse loginResponse = employeeService.loginEmployee(loginDTO);
+			return ResponseEntity.ok(loginResponse);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+		}
 	}
-	
 }
+
